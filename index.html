@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>达人圈选 Agent · AI 营销工作台</title>
+<style>
+:root{
+  --bg:#F5F6F8;
+  --card:#FFFFFF;
+  --line:#E4E7EC;
+  --line-2:#CFD4DC;
+  --ink:#0E1726;
+  --ink-2:#475467;
+  --ink-3:#98A2B3;
+  --brand:#1F4FE0;
+  --brand-2:#3B6BF5;
+  --brand-soft:#EEF2FF;
+  --brand-ink:#173A9E;
+  --pos:#0E9F6E;
+  --neg:#D92D20;
+  --warn:#B54708;
+  --r:12px;
+  --r-lg:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:14px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--brand);text-decoration:none}
+h1,h2,h3,h4{margin:0;font-weight:600;letter-spacing:-.01em}
+p{margin:0}
+.topbar{
+  position:sticky;top:0;z-index:50;
+  height:56px;background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(180%) blur(8px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;
+}
+.topbar .inner{width:100%;max-width:1180px;margin:0 auto;padding:0 24px;display:flex;align-items:center;gap:20px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:600;color:var(--ink);font-size:14px;white-space:nowrap}
+.logo .mark{width:22px;height:22px;border-radius:6px;background:var(--brand);position:relative;flex:0 0 auto}
+.logo .mark:after{content:"";position:absolute;left:5px;top:5px;width:12px;height:12px;border-radius:3px;background:#fff;opacity:.9}
+.nav{display:flex;gap:4px;margin-left:6px;flex-wrap:wrap}
+.nav a{padding:6px 10px;border-radius:8px;color:var(--ink-2);font-size:13px}
+.nav a:hover{background:#F2F4F7;color:var(--ink)}
+.nav a.on{background:var(--brand-soft);color:var(--brand-ink);font-weight:500}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-2);background:#F2F4F7;border:1px solid var(--line);padding:3px 9px;border-radius:999px}
+.pill .dot{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
+.pill.ok .dot{background:var(--pos)}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 24px 72px}
+.page-head{margin-bottom:22px}
+.page-head h1{font-size:22px;margin-bottom:6px}
+.page-head .sub{color:var(--ink-2);font-size:13px;max-width:760px}
+.crumb{font-size:12px;color:var(--ink-3);margin-bottom:10px}
+.crumb a{color:var(--ink-3)}
+.crumb a:hover{color:var(--brand)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.panel + .panel{margin-top:16px}
+.panel h3{font-size:14px;margin-bottom:4px}
+.panel .hint{font-size:12px;color:var(--ink-3);margin-bottom:14px}
+.cols{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:940px){.cols{grid-template-columns:1fr}}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+label.lab{display:block;font-size:12px;font-weight:500;color:var(--ink-2);margin-bottom:6px}
+input[type=text],input[type=number],input[type=password],textarea,select{
+  width:100%;border:1px solid var(--line-2);border-radius:8px;background:#fff;
+  padding:9px 11px;font-size:13px;font-family:inherit;color:var(--ink);outline:none;
+  transition:border-color .15s,box-shadow .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(31,79,224,.10)}
+textarea{resize:vertical;min-height:96px;line-height:1.6}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);border-radius:999px;padding:5px 11px;font-size:12.5px;color:var(--ink-2);cursor:pointer;user-select:none;background:#fff;transition:.15s}
+.chip:hover{border-color:var(--brand-2)}
+.chip input{display:none}
+.chip.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-ink);font-weight:500}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:1px solid transparent;border-radius:8px;padding:9px 16px;font-size:13px;
+  font-family:inherit;font-weight:500;cursor:pointer;background:var(--brand);color:#fff;
+  transition:.15s;white-space:nowrap;
+}
+.btn:hover{background:#1A45C9}
+.btn.ghost{background:#fff;border-color:var(--line-2);color:var(--ink-2)}
+.btn.ghost:hover{background:#F9FAFB;border-color:var(--ink-3);color:var(--ink)}
+.btn.sm{padding:6px 11px;font-size:12px}
+.btn.block{width:100%}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+@media (max-width:940px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.kpi .k{font-size:12px;color:var(--ink-2);margin-bottom:6px}
+.kpi .v{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.kpi .v small{font-size:12px;font-weight:400;color:var(--ink-3);margin-left:3px}
+.kpi .d{font-size:11px;color:var(--ink-3);margin-top:4px}
+.split{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.split{grid-template-columns:1fr}}
+.legend{display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:var(--ink-2)}
+.legend .row{display:flex;align-items:center;gap:8px}
+.legend .sw{width:9px;height:9px;border-radius:3px;flex:0 0 auto}
+.legend .num{margin-left:auto;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+canvas{width:100%;display:block}
+.topic{border:1px solid var(--line);border-radius:10px;padding:13px 14px;margin-bottom:10px;background:#fff}
+.topic:last-child{margin-bottom:0}
+.topic .th{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.topic .th b{font-size:13px;font-weight:600}
+.topic .th .n{font-size:12px;color:var(--ink-3)}
+.topic .quote{font-size:12.5px;color:var(--ink-2);border-left:2px solid var(--line-2);padding-left:10px;margin:6px 0}
+.topic .adv{font-size:12.5px;color:var(--brand-ink);background:var(--brand-soft);border-radius:7px;padding:7px 10px;margin-top:6px}
+.tag{display:inline-block;font-size:11px;padding:2px 7px;border-radius:5px;background:#F2F4F7;color:var(--ink-2);border:1px solid var(--line)}
+.tag.pos{background:#ECFDF3;color:#027A48;border-color:#D1FADF}
+.tag.neg{background:#FEF3F2;color:#B42318;border-color:#FEE4E2}
+.tag.neu{background:#F2F4F7;color:#475467}
+.tag.brand{background:var(--brand-soft);color:var(--brand-ink);border-color:#DDE4FF}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;color:var(--ink-2);font-weight:500;background:#FAFBFC;white-space:nowrap}
+tbody tr:hover{background:#FCFCFD}
+td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+.report{font-size:13px;line-height:1.85;color:var(--ink);white-space:pre-wrap;word-break:break-word}
+.report strong{font-weight:600}
+.empty{color:var(--ink-3);font-size:12.5px;padding:26px 0;text-align:center}
+.note{font-size:11.5px;color:var(--ink-3);line-height:1.7}
+.note b{color:var(--ink-2);font-weight:500}
+.divider{height:1px;background:var(--line);margin:16px 0}
+.modal-mask{position:fixed;inset:0;background:rgba(15,23,42,.34);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.modal-mask.on{display:flex}
+.modal{background:#fff;border-radius:var(--r-lg);width:100%;max-width:460px;padding:22px;box-shadow:0 24px 60px rgba(15,23,42,.18)}
+.modal h3{font-size:15px;margin-bottom:4px}
+.modal .hint{font-size:12px;color:var(--ink-3);margin-bottom:16px}
+.modal .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+#toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(12px);background:#0E1726;color:#fff;font-size:13px;padding:10px 16px;border-radius:9px;opacity:0;pointer-events:none;transition:.22s;z-index:300}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+footer.site{border-top:1px solid var(--line);margin-top:40px;padding:22px 0 0;font-size:12px;color:var(--ink-3)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+.scroll{overflow-x:auto}
+
+</style>
+<style>
+.wrow{display:grid;grid-template-columns:96px 1fr 40px;gap:10px;align-items:center;font-size:12.5px;margin-bottom:10px}
+.wrow input[type=range]{width:100%;accent-color:#1F4FE0}
+.wrow .n{color:var(--ink-2)}
+.wrow .v{text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+.rank{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:6px;background:#F2F4F7;font-size:11px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.rank.top{background:var(--brand);color:#fff}
+td .nm{font-weight:500}
+td .sub{font-size:11px;color:var(--ink-3)}
+.bar{height:5px;background:#F2F4F7;border-radius:3px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:5px;background:#1F4FE0}
+.pick{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.pick .h{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.pick .h b{font-size:13px}
+.pick .h .tag{margin-left:auto}
+.script{font-size:12.5px;color:var(--ink-2);line-height:1.8;background:#FAFBFC;border:1px solid var(--line);border-radius:8px;padding:10px 12px;white-space:pre-wrap;margin-top:8px}
+.risk{font-size:12.5px;color:var(--warn);background:#FFFAEB;border:1px solid #FDE9C4;border-radius:8px;padding:10px 12px;line-height:1.75}
+.hide{display:none !important}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="inner">
+    <a class="logo" href="./index.html"><span class="mark"></span>AI 营销工作台</a>
+    <nav class="nav"><a href="index.html" class="on">作品 03 · 达人圈选 Agent</a></nav>
+    <div class="nav-right"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="page-head">
+    <div class="crumb">作品 03 · 独立工具</div>
+    <h1>达人圈选 Agent</h1>
+    <p class="sub">把「这笔预算该投给谁」从经验判断变成可复算的模型：四个维度加权打分、预算内自动组队、逐人生成建联话术。每一项得分都能展开看公式。</p>
+  </div>
+
+  <div class="cols">
+    <div>
+      <section class="panel">
+        <h3>投放 Brief</h3>
+        <p class="hint">目标人群可多选，直接决定人群匹配分；预算决定能组出什么盘子。</p>
+        <div class="field">
+          <label class="lab">品牌 / 产品</label>
+          <input type="text" id="product" value="澄野 光感小银瓶精华" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="lab">品类关键词（逗号分隔）</label>
+          <input type="text" id="category" value="护肤,精华,修护,敏感肌" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="lab">目标人群</label>
+          <div class="chips" id="aud">
+            <label class="chip on"><input type="checkbox" value="白领女性" checked>白领女性</label>
+            <label class="chip on"><input type="checkbox" value="油皮" checked>油皮</label>
+            <label class="chip"><input type="checkbox" value="学生党">学生党</label>
+            <label class="chip"><input type="checkbox" value="成分党">成分党</label>
+            <label class="chip"><input type="checkbox" value="敏感肌">敏感肌</label>
+            <label class="chip"><input type="checkbox" value="痘肌">痘肌</label>
+            <label class="chip"><input type="checkbox" value="宝妈">宝妈</label>
+            <label class="chip"><input type="checkbox" value="男性">男性</label>
+            <label class="chip"><input type="checkbox" value="熟龄肌">熟龄肌</label>
+          </div>
+        </div>
+        <div class="field">
+          <label class="lab">营销目标</label>
+          <select id="goal">
+            <option value="seed" selected>种草（要内容质量与讨论度）</option>
+            <option value="sales">带货（要转化与 ROI）</option>
+            <option value="brand">品宣（要曝光与背书）</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lab">平台</label>
+          <select id="plat">
+            <option value="">不限平台</option>
+            <option>小红书</option><option>抖音</option><option>微博</option><option>视频号</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lab">可分配预算（元）</label>
+          <input type="number" id="budget" value="60000" min="0" step="1000">
+        </div>
+        <div class="btn-row">
+          <button class="btn" type="button" id="btn-run" style="flex:1">生成圈选方案</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h3>评分权重</h3>
+        <p class="hint">权重可调，改完重新生成即生效——排名不是黑箱。</p>
+        <div class="wrow"><span class="n">人群匹配</span><input type="range" id="w-aud" min="0" max="60" value="30"><span class="v" id="v-aud">30</span></div>
+        <div class="wrow"><span class="n">内容相关</span><input type="range" id="w-rel" min="0" max="60" value="25"><span class="v" id="v-rel">25</span></div>
+        <div class="wrow"><span class="n">性价比</span><input type="range" id="w-cpe" min="0" max="60" value="25"><span class="v" id="v-cpe">25</span></div>
+        <div class="wrow"><span class="n">规模适配</span><input type="range" id="w-scale" min="0" max="60" value="20"><span class="v" id="v-scale">20</span></div>
+      </section>
+
+      <section class="panel">
+        <h3>达人池</h3>
+        <p class="hint">默认使用 32 条虚构示例档案；可导入自有名单（CSV）。</p>
+        <div class="btn-row" style="margin-bottom:10px">
+          <button class="btn ghost sm" type="button" id="btn-demo">载入示例池</button>
+          <label class="btn ghost sm" style="cursor:pointer">导入 CSV<input type="file" id="file" accept=".csv,.txt" style="display:none"></label>
+        </div>
+        <p class="note" id="pool-note">示例数据为虚构档案，仅演示评分与组队算法，不对应任何真实达人。</p>
+      </section>
+    </div>
+
+    <div>
+      <section class="panel" id="sum-panel">
+        <h3>方案概览</h3>
+        <p class="hint">按当前权重与预算自动组队的结果</p>
+        <div class="kpis" id="kpis" style="margin-bottom:0">
+          <div class="kpi"><div class="k">入选达人</div><div class="v">—</div><div class="d">位</div></div>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:16px">
+        <h3>评分排序</h3>
+        <p class="hint">得分 = 人群 × w1 + 相关 × w2 + 性价比 × w3 + 规模 × w4（权重自动归一）</p>
+        <div class="scroll">
+          <table id="tbl">
+            <thead><tr>
+              <th>#</th><th>达人</th><th>层级</th><th class="num">粉丝</th><th class="num">报价</th>
+              <th class="num">预估互动</th><th class="num">CPE</th><th class="num">人群</th><th class="num">相关</th><th class="num">性价比</th><th class="num">规模</th><th class="num">总分</th>
+            </tr></thead>
+            <tbody id="rows"><tr><td colspan="12"><div class="empty">左侧点击「生成圈选方案」</div></td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel hide" id="plan-panel" style="margin-top:16px">
+        <h3>推荐组合与建联话术</h3>
+        <p class="hint" id="plan-hint"></p>
+        <div id="plan"></div>
+        <div class="btn-row" style="margin-top:6px">
+          <button class="btn ghost sm" type="button" id="btn-llm">用大模型润色话术</button>
+          <button class="btn ghost sm" type="button" id="btn-csv">导出名单 CSV</button>
+        </div>
+      </section>
+
+      <section class="panel" style="margin-top:16px">
+        <h3>风险与边界</h3>
+        <div class="risk">粉丝真实度、互动质量、历史转化率无法从公开信息推断。本工具只做结构化的初筛与组队，入选名单必须再用平台后台数据或第三方监测复核：重点看粉丝画像重合度、近 30 天互动中位数、同品类近期是否接过竞品。示例池为虚构数据，不构成任何真实达人的商务建议。</div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var NS = 'bf2027.';
+
+  var Store = {
+    get: function (k, d) {
+      try {
+        var v = localStorage.getItem(NS + k);
+        return v == null ? d : JSON.parse(v);
+      } catch (e) { return d; }
+    },
+    set: function (k, v) {
+      try { localStorage.setItem(NS + k, JSON.stringify(v)); } catch (e) {}
+    },
+    del: function (k) {
+      try { localStorage.removeItem(NS + k); } catch (e) {}
+    }
+  };
+
+  var LLM = {
+    cfg: function () { return Store.get('llm', { base: '', key: '', model: '' }) || {}; },
+    ok: function () { var c = this.cfg(); return !!(c.base && c.key && c.model); },
+    chat: function (messages, opt) {
+      opt = opt || {};
+      var c = this.cfg();
+      var self = this;
+      if (!self.ok()) return Promise.reject(new Error('尚未配置大模型'));
+      var url = String(c.base).replace(/\/+$/, '') + '/chat/completions';
+      var body = { model: c.model, messages: messages, temperature: opt.temperature == null ? 0.7 : opt.temperature };
+      if (opt.json) body.response_format = { type: 'json_object' };
+      return fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + c.key },
+        body: JSON.stringify(body)
+      }).then(function (res) {
+        if (!res.ok) {
+          return res.text().then(function (t) {
+            throw new Error('接口返回 ' + res.status + '：' + String(t).slice(0, 140));
+          });
+        }
+        return res.json();
+      }).then(function (j) {
+        var m = j && j.choices && j.choices[0] && j.choices[0].message;
+        if (!m) throw new Error('返回结构异常');
+        return m.content || '';
+      });
+    }
+  };
+
+  function toast(msg, ms) {
+    var t = document.getElementById('toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'toast';
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.classList.add('on');
+    clearTimeout(t._tm);
+    t._tm = setTimeout(function () { t.classList.remove('on'); }, ms || 2200);
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text).then(function () { toast('已复制'); });
+    }
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('已复制'); } catch (e) { toast('复制失败'); }
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+
+  function download(name, text, mime) {
+    var blob = new Blob(['\ufeff' + text], { type: (mime || 'text/markdown') + ';charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1200);
+  }
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    r = Math.min(r, h / 2, w / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function setupCanvas(canvas, height) {
+    var r = window.devicePixelRatio || 1;
+    var w = canvas.clientWidth || canvas.parentNode.clientWidth || 480;
+    var h = height || canvas.clientHeight || 220;
+    canvas.width = Math.round(w * r);
+    canvas.height = Math.round(h * r);
+    canvas.style.height = h + 'px';
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(r, 0, 0, r, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  function clipText(ctx, text, maxW) {
+    text = String(text);
+    if (ctx.measureText(text).width <= maxW) return text;
+    var out = '';
+    for (var i = 0; i < text.length; i++) {
+      if (ctx.measureText(out + text[i] + '…').width > maxW) break;
+      out += text[i];
+    }
+    return out + '…';
+  }
+
+  function drawHBars(canvas, items, color) {
+    var box = setupCanvas(canvas, canvas.dataset.h ? Number(canvas.dataset.h) : 0);
+    var ctx = box.ctx, w = box.w, h = box.h;
+    if (!items.length) return;
+    var n = items.length;
+    var labelW = Math.min(104, Math.max(64, w * 0.3));
+    var rowH = Math.min(30, (h - 12) / n);
+    var max = Math.max.apply(null, items.map(function (i) { return i.value; })) || 1;
+    var barMax = w - labelW - 52;
+    ctx.textBaseline = 'middle';
+    items.forEach(function (it, i) {
+      var cy = 8 + i * rowH + rowH / 2;
+      ctx.font = '12px -apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+      ctx.fillStyle = '#475467';
+      ctx.textAlign = 'right';
+      ctx.fillText(clipText(ctx, it.label, labelW - 10), labelW - 8, cy);
+      var bw = Math.max(2, barMax * (it.value / max));
+      ctx.fillStyle = color || '#1F4FE0';
+      roundRect(ctx, labelW + 4, cy - rowH * 0.26, bw, rowH * 0.52, 3);
+      ctx.fill();
+      ctx.fillStyle = '#98A2B3';
+      ctx.textAlign = 'left';
+      ctx.font = '11px -apple-system,"PingFang SC",sans-serif';
+      ctx.fillText(String(it.value), labelW + 10 + bw, cy);
+    });
+  }
+
+  function drawDonut(canvas, parts, centerTop, centerSub) {
+    var box = setupCanvas(canvas, canvas.dataset.h ? Number(canvas.dataset.h) : 0);
+    var ctx = box.ctx, w = box.w, h = box.h;
+    var cx = w / 2, cy = h / 2, R = Math.min(w, h) / 2 - 6, IR = R * 0.64;
+    var total = parts.reduce(function (s, p) { return s + p.value; }, 0) || 1;
+    var a = -Math.PI / 2;
+    parts.forEach(function (p) {
+      var ang = Math.PI * 2 * (p.value / total);
+      if (ang <= 0) return;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, a, a + ang);
+      ctx.arc(cx, cy, IR, a + ang, a, true);
+      ctx.closePath();
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      a += ang;
+    });
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#0E1726';
+    ctx.font = '600 19px -apple-system,"PingFang SC",sans-serif';
+    ctx.fillText(centerTop || '', cx, cy - 6);
+    ctx.fillStyle = '#98A2B3';
+    ctx.font = '11px -apple-system,"PingFang SC",sans-serif';
+    ctx.fillText(centerSub || '', cx, cy + 14);
+  }
+
+  function mountSettings() {
+    var right = $('.topbar .nav-right');
+    if (!right) return;
+    var badge = document.createElement('span');
+    badge.className = 'pill';
+    badge.id = 'llm-pill';
+    badge.innerHTML = '<span class="dot"></span><span class="txt">未配置模型</span>';
+
+    var btn = document.createElement('button');
+    btn.className = 'btn ghost sm';
+    btn.type = 'button';
+    btn.textContent = '模型设置';
+
+    right.appendChild(badge);
+    right.appendChild(btn);
+
+    var mask = document.createElement('div');
+    mask.className = 'modal-mask';
+    mask.innerHTML =
+      '<div class="modal" role="dialog" aria-modal="true">' +
+        '<h3>接入大模型（可选）</h3>' +
+        '<p class="hint">不接入也能用：工具内置规则引擎可离线跑通。接入后由模型生成文案与洞察，效果更自然。<br>接口需兼容 OpenAI <span class="mono">/chat/completions</span>，且服务商允许浏览器跨域调用。</p>' +
+        '<div class="field"><label class="lab">Base URL</label><input type="text" id="cfg-base" placeholder="https://api.deepseek.com/v1" autocomplete="off"></div>' +
+        '<div class="field"><label class="lab">API Key</label><input type="password" id="cfg-key" placeholder="sk-..." autocomplete="off"></div>' +
+        '<div class="field"><label class="lab">模型名</label><input type="text" id="cfg-model" placeholder="deepseek-chat" autocomplete="off"></div>' +
+        '<p class="note">Key 只保存在你本机浏览器 localStorage，不会上传到任何服务器。</p>' +
+        '<div class="foot"><button class="btn ghost sm" type="button" data-act="clear">清除</button><button class="btn sm" type="button" data-act="save">保存</button></div>' +
+      '</div>';
+    document.body.appendChild(mask);
+
+    function refresh() {
+      var c = LLM.cfg();
+      var on = LLM.ok();
+      badge.className = 'pill' + (on ? ' ok' : '');
+      badge.querySelector('.txt').textContent = on ? ('已接入 ' + c.model) : '未配置模型';
+    }
+
+    btn.addEventListener('click', function () {
+      var c = LLM.cfg();
+      $('#cfg-base').value = c.base || '';
+      $('#cfg-key').value = c.key || '';
+      $('#cfg-model').value = c.model || '';
+      mask.classList.add('on');
+    });
+    mask.addEventListener('click', function (e) {
+      if (e.target === mask) mask.classList.remove('on');
+      var act = e.target.getAttribute && e.target.getAttribute('data-act');
+      if (act === 'save') {
+        var base = $('#cfg-base').value.trim();
+        var key = $('#cfg-key').value.trim();
+        var model = $('#cfg-model').value.trim();
+        if (!base || !key || !model) { toast('三项都要填'); return; }
+        Store.set('llm', { base: base, key: key, model: model });
+        mask.classList.remove('on');
+        refresh();
+        toast('已保存，本次会话生效');
+      }
+      if (act === 'clear') {
+        Store.del('llm');
+        mask.classList.remove('on');
+        refresh();
+        toast('已清除');
+      }
+    });
+    refresh();
+    window.__refreshLLM = refresh;
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    mountSettings();
+    $$('canvas[data-chart]').forEach(function (c) {
+      if (c.dataset.ready) return;
+      c.dataset.ready = '1';
+    });
+  });
+
+  window.App = {
+    Store: Store, LLM: LLM, toast: toast, copyText: copyText, download: download,
+    esc: esc, $: $, $$: $$, drawHBars: drawHBars, drawDonut: drawDonut, roundRect: roundRect
+  };
+})();
+
+</script>
+<script>
+/* 演示数据说明：以下内容为**虚构示例数据**，用于演示工具的算法与分析流程。
+   真实使用时请通过页面内的「导入自己的数据」替换，工具不内置、不声称任何真实平台的采集数据。 */
+window.BFDemo = {
+  brand: '澄野 CENYO',
+  category: '功效护肤 / 精华',
+  note: '虚构品牌与示例评论（40 条），仅用于演示分词、情感判定、主题归类与报告生成逻辑。',
+
+  comments: [
+    { id: 'C01', user: '用户_7***2', platform: '小红书', date: '2026-10-18', likes: 412, text: '用了两周，下巴的闭口少了很多，皮肤状态稳定，已经回购第二瓶了' },
+    { id: 'C02', user: '用户_3***8', platform: '小红书', date: '2026-10-18', likes: 233, text: '质地很清爽，上脸吸收快，不搓泥，混油皮夏天用也不闷' },
+    { id: 'C03', user: '用户_9***1', platform: '天猫', date: '2026-10-19', likes: 12, text: '包装泵头很难按，每次挤出来一大坨，浪费挺多的' },
+    { id: 'C04', user: '用户_1***5', platform: '天猫', date: '2026-10-19', likes: 8, text: '价格确实偏贵，30ml 要 399，等活动再考虑入手' },
+    { id: 'C05', user: '用户_6***4', platform: '小红书', date: '2026-10-20', likes: 156, text: '香味有点冲，敏感肌用着有一点点刺激，需要建立耐受' },
+    { id: 'C06', user: '用户_2***7', platform: '天猫', date: '2026-10-20', likes: 5, text: '快递太慢了，等了六天才到，物流体验有点失望' },
+    { id: 'C07', user: '用户_8***3', platform: '天猫', date: '2026-10-21', likes: 21, text: '客服回复很敷衍，问成分表半天不回，售后体验差' },
+    { id: 'C08', user: '用户_4***9', platform: '抖音', date: '2026-10-21', likes: 89, text: '坚持用了一个月，鼻翼两侧泛红明显改善，同事都问我是不是做了项目' },
+    { id: 'C09', user: '用户_5***6', platform: '小红书', date: '2026-10-22', likes: 187, text: '瓶身设计很好看，摆在桌上很有质感，颜值加分' },
+    { id: 'C10', user: '用户_0***2', platform: '天猫', date: '2026-10-22', likes: 3, text: '收到的时候外包装破损，瓶子漏了一半，很心疼' },
+    { id: 'C11', user: '用户_7***8', platform: '抖音', date: '2026-10-23', likes: 342, text: '抖音直播间买的，比官旗便宜不少，性价比还不错' },
+    { id: 'C12', user: '用户_3***1', platform: '小红书', date: '2026-10-23', likes: 64, text: '质地偏厚一点，但冬天用正好，滋润不闷，吸收也快' },
+    { id: 'C13', user: '用户_9***5', platform: '小红书', date: '2026-10-24', likes: 128, text: '敏感肌友好，用了一个月没有泛红没有闷痘，会推荐给朋友' },
+    { id: 'C14', user: '用户_2***3', platform: '天猫', date: '2026-10-24', likes: 14, text: '和详情页描述不一致，说是水感质地实际很黏，有点被劝退' },
+    { id: 'C15', user: '用户_6***7', platform: '抖音', date: '2026-10-25', likes: 76, text: '味道是很干净的植物味，不刺鼻，这点好评' },
+    { id: 'C16', user: '用户_1***4', platform: '天猫', date: '2026-10-25', likes: 2, text: '用了之后脸颊起皮，可能是我的皮肤太干，也可能浓度太高' },
+    { id: 'C17', user: '用户_8***2', platform: '小红书', date: '2026-10-25', likes: 201, text: '早C晚A搭配这个精华，肤色确实透亮了一些，坚持用有感觉' },
+    { id: 'C18', user: '用户_4***6', platform: '微博', date: '2026-10-26', likes: 45, text: '这个价位的修护精华里算能打的，配方思路清晰，成分党可以看看' },
+    { id: 'C19', user: '用户_5***9', platform: '天猫', date: '2026-10-26', likes: 9, text: '发货快，第二天就到了，包装也很用心' },
+    { id: 'C20', user: '用户_0***8', platform: '小红书', date: '2026-10-26', likes: 97, text: '油皮表示很满意，控油效果明显，一天下来T区没那么亮' },
+    { id: 'C21', user: '用户_7***1', platform: '抖音', date: '2026-10-27', likes: 58, text: '主播讲得太夸张了，实际效果没那么神，有点失望' },
+    { id: 'C22', user: '用户_3***4', platform: '天猫', date: '2026-10-27', likes: 6, text: '小样给得很少，赠品不如别家，感觉不太划算' },
+    { id: 'C23', user: '用户_9***7', platform: '小红书', date: '2026-10-27', likes: 143, text: '搭配同系列面霜用了三周，上妆更服帖了，不卡粉' },
+    { id: 'C24', user: '用户_2***9', platform: '天猫', date: '2026-10-28', likes: 4, text: '申请退货流程很麻烦，客服一直让我提供各种证明材料' },
+    { id: 'C25', user: '用户_6***2', platform: '抖音', date: '2026-10-28', likes: 112, text: '回购第三次了，换季泛红就靠它，稳定得很' },
+    { id: 'C26', user: '用户_1***8', platform: '小红书', date: '2026-10-28', likes: 67, text: '真空泵设计很卫生，但压头有点松，出差带会漏' },
+    { id: 'C27', user: '用户_8***5', platform: '天猫', date: '2026-10-28', likes: 11, text: '搞活动的时候价格还行，原价买真的贵，学生党压力大' },
+    { id: 'C28', user: '用户_4***1', platform: '微博', date: '2026-10-29', likes: 33, text: '看了成分表有烟酰胺，浓度不低，第一次用有点刺痛，后来适应了' },
+    { id: 'C29', user: '用户_5***3', platform: '天猫', date: '2026-10-29', likes: 7, text: '下单三天了还没发货，问客服只说在排单，体验一般' },
+    { id: 'C30', user: '用户_0***6', platform: '抖音', date: '2026-10-29', likes: 88, text: '连用七天，痘印淡了一点，但没到视频里那种程度' },
+    { id: 'C31', user: '用户_7***9', platform: '小红书', date: '2026-10-29', likes: 175, text: '干皮友好，滋润度够，冬天单独用也不拔干' },
+    { id: 'C32', user: '用户_3***2', platform: '天猫', date: '2026-10-30', likes: 3, text: '瓶口容易沾到精华，用久了瓶身黏糊糊的，细节可以改进' },
+    { id: 'C33', user: '用户_9***4', platform: '小红书', date: '2026-10-30', likes: 214, text: '安利给整个宿舍，我们四个人都在用，闭口真的少了' },
+    { id: 'C34', user: '用户_2***1', platform: '微博', date: '2026-10-30', likes: 26, text: '希望出 50ml 大容量装，30ml 用得太快，性价比会更好' },
+    { id: 'C35', user: '用户_6***9', platform: '抖音', date: '2026-10-30', likes: 52, text: '质地像水一样，夏天用完全不黏，这个季节用刚好' },
+    { id: 'C36', user: '用户_1***2', platform: '天猫', date: '2026-10-30', likes: 5, text: '送的旅行装很小，出门两天就用完了，实用性一般' },
+    { id: 'C37', user: '用户_8***6', platform: '小红书', date: '2026-10-30', likes: 189, text: '第三瓶了，换季就靠它稳住，闭口和泛红都少了很多' },
+    { id: 'C38', user: '用户_2***4', platform: '天猫', date: '2026-10-30', likes: 15, text: '活动力度可以，回购价比首发便宜，划算' },
+    { id: 'C39', user: '用户_5***7', platform: '抖音', date: '2026-10-30', likes: 97, text: '质地真的绝，上脸轻薄，夏天用完全没负担' },
+    { id: 'C40', user: '用户_0***3', platform: '微博', date: '2026-10-30', likes: 41, text: '成分表干净，无香精这点好评，敏感肌可以放心试' }
+  ],
+
+  kol: [
+    { id: 'K01', name: '成分说阿May', platform: '小红书', category: '护肤成分', followers: 486000, avgViews: 62000, er: 0.058, female: 0.91, age: '25-34', price: 32000, style: '成分解析/实验室视角', tags: ['成分党', '白领女性', '理性种草'] },
+    { id: 'K02', name: '小满的护肤日记', platform: '小红书', category: '护肤日常', followers: 128000, avgViews: 21000, er: 0.082, female: 0.94, age: '18-24', price: 8600, style: '空瓶记录/真实测评', tags: ['学生党', '油皮', '真实测评'] },
+    { id: 'K03', name: '周周不熬夜', platform: '小红书', category: '生活方式', followers: 76000, avgViews: 15000, er: 0.091, female: 0.88, age: '25-34', price: 5200, style: 'vlog/生活场景', tags: ['白领女性', '熬夜党', '轻熟肌'] },
+    { id: 'K04', name: '皮肤科李医生', platform: '小红书', category: '专业医学科普', followers: 920000, avgViews: 120000, er: 0.041, female: 0.72, age: '25-44', price: 68000, style: '医学知识科普', tags: ['敏感肌', '专业背书', '理性种草'] },
+    { id: 'K05', name: '阿茶测评室', platform: '抖音', category: '美妆测评', followers: 1560000, avgViews: 210000, er: 0.038, female: 0.79, age: '18-30', price: 95000, style: '对比实测/踩雷避坑', tags: ['油皮', '混油皮', '性价比'] },
+    { id: 'K06', name: '毛豆不吃香菜', platform: '抖音', category: '学生日常', followers: 64000, avgViews: 18000, er: 0.112, female: 0.96, age: '18-22', price: 2600, style: '宿舍场景/搞笑', tags: ['学生党', '预算有限', '轻喜剧'] },
+    { id: 'K07', name: 'Sophia在沪上', platform: '小红书', category: '职场穿搭', followers: 214000, avgViews: 33000, er: 0.064, female: 0.93, age: '25-34', price: 18000, style: '通勤/精致生活', tags: ['白领女性', '上海', '轻奢'] },
+    { id: 'K08', name: '宝妈小鹿', platform: '视频号', category: '母婴育儿', followers: 152000, avgViews: 26000, er: 0.073, female: 0.97, age: '28-40', price: 9800, style: '育儿经验分享', tags: ['宝妈', '成分安全', '家庭场景'] },
+    { id: 'K09', name: '一颗橘子酱', platform: '小红书', category: '护肤测评', followers: 39000, avgViews: 9800, er: 0.104, female: 0.95, age: '18-24', price: 1800, style: '平价替代/学生党', tags: ['学生党', '平价', '敏感肌'] },
+    { id: 'K10', name: '大熊爱护肤', platform: '抖音', category: '男士护肤', followers: 328000, avgViews: 48000, er: 0.052, female: 0.18, age: '20-30', price: 15000, style: '直男视角测评', tags: ['男性', '油皮', '简约'] },
+    { id: 'K11', name: '妮可NiNi', platform: '小红书', category: '美妆教程', followers: 682000, avgViews: 88000, er: 0.047, female: 0.9, age: '20-30', price: 42000, style: '妆容教程/上脸演示', tags: ['混干皮', '学生党', '颜值向'] },
+    { id: 'K12', name: '晚晚的化妆台', platform: '抖音', category: '美妆种草', followers: 94000, avgViews: 16000, er: 0.078, female: 0.87, age: '20-28', price: 4200, style: '开箱/种草口播', tags: ['混油皮', '平价', '学生党'] },
+    { id: 'K13', name: '成分实验室Pro', platform: '微博', category: '成分科普', followers: 268000, avgViews: 42000, er: 0.035, female: 0.66, age: '25-40', price: 12000, style: '图文长文/配方解读', tags: ['成分党', '理性种草', '男性'] },
+    { id: 'K14', name: '柴柴的护肤账本', platform: '小红书', category: '护肤理财', followers: 58000, avgViews: 12000, er: 0.088, female: 0.92, age: '22-30', price: 3600, style: '成本核算/理性消费', tags: ['性价比', '白领女性', '理性种草'] },
+    { id: 'K15', name: '医美护士小鹿', platform: '抖音', category: '医美科普', followers: 176000, avgViews: 29000, er: 0.061, female: 0.84, age: '25-35', price: 11000, style: '术后修护/专业建议', tags: ['敏感肌', '医美人群', '专业背书'] },
+    { id: 'K16', name: '林小满Mia', platform: '小红书', category: '生活方式', followers: 42000, avgViews: 8600, er: 0.096, female: 0.95, age: '22-28', price: 2400, style: '居家vlog/治愈系', tags: ['白领女性', '氛围感', '轻熟肌'] },
+    { id: 'K17', name: '老张说成分', platform: '视频号', category: '成分科普', followers: 118000, avgViews: 22000, er: 0.044, female: 0.52, age: '30-45', price: 7600, style: '口播拆解配方', tags: ['成分党', '理性种草', '中年'] },
+    { id: 'K18', name: '奶油小方', platform: '抖音', category: '剧情种草', followers: 486000, avgViews: 74000, er: 0.049, female: 0.9, age: '18-26', price: 26000, style: '短剧植入', tags: ['学生党', '泛人群', '轻喜剧'] },
+    { id: 'K19', name: '护肤避雷针', platform: '微博', category: '测评吐槽', followers: 88000, avgViews: 15000, er: 0.057, female: 0.78, age: '20-32', price: 4800, style: '犀利测评/避雷', tags: ['油皮', '避雷', '理性种草'] },
+    { id: 'K20', name: '米娅的梳妆台', platform: '小红书', category: '轻奢护肤', followers: 156000, avgViews: 27000, er: 0.071, female: 0.93, age: '28-40', price: 14000, style: '高端用品/质感展示', tags: ['轻奢', '白领女性', '熟龄肌'] },
+    { id: 'K21', name: '阿凯Ken', platform: '小红书', category: '男士理容', followers: 54000, avgViews: 11000, er: 0.069, female: 0.12, age: '22-32', price: 3200, style: '理容教程', tags: ['男性', '油皮', '简约'] },
+    { id: 'K22', name: '小鹿妈妈优选', platform: '抖音', category: '母婴好物', followers: 236000, avgViews: 34000, er: 0.058, female: 0.98, age: '28-40', price: 16000, style: '带娃场景/好物推荐', tags: ['宝妈', '家庭场景', '成分安全'] },
+    { id: 'K23', name: '痘痘肌自救指南', platform: '小红书', category: '痘肌护理', followers: 92000, avgViews: 19000, er: 0.093, female: 0.83, age: '18-26', price: 5600, style: '抗痘记录/前后对比', tags: ['痘肌', '油皮', '学生党'] },
+    { id: 'K24', name: 'Vivi的护肤公式', platform: '小红书', category: '护肤科普', followers: 186000, avgViews: 31000, er: 0.062, female: 0.91, age: '24-34', price: 15000, style: '体系化讲原理', tags: ['成分党', '白领女性', '理性种草'] },
+    { id: 'K25', name: '橘子汽水O', platform: '抖音', category: '颜值博主', followers: 720000, avgViews: 98000, er: 0.042, female: 0.89, age: '18-25', price: 46000, style: '颜值向/氛围感', tags: ['泛人群', '颜值向', '学生党'] },
+    { id: 'K26', name: '三十岁以后', platform: '视频号', category: '熟龄护肤', followers: 68000, avgViews: 14000, er: 0.066, female: 0.94, age: '35-50', price: 6200, style: '抗老经验分享', tags: ['熟龄肌', '白领女性', '抗老'] },
+    { id: 'K27', name: '打工人护肤局', platform: '微博', category: '职场生活', followers: 46000, avgViews: 9000, er: 0.052, female: 0.86, age: '24-34', price: 2100, style: '职场吐槽/场景共鸣', tags: ['白领女性', '熬夜党', '性价比'] },
+    { id: 'K28', name: '楠楠Na', platform: '小红书', category: '美妆测评', followers: 112000, avgViews: 20000, er: 0.079, female: 0.92, age: '20-30', price: 8200, style: '多品横评', tags: ['混干皮', '平价', '真实测评'] },
+    { id: 'K29', name: '成分控小满', platform: '抖音', category: '成分科普', followers: 148000, avgViews: 23000, er: 0.055, female: 0.74, age: '22-34', price: 9200, style: '30秒讲清一个成分', tags: ['成分党', '理性种草', '泛人群'] },
+    { id: 'K30', name: '敏感肌日记', platform: '小红书', category: '敏感肌护理', followers: 36000, avgViews: 8200, er: 0.108, female: 0.93, age: '20-32', price: 1600, style: '长期跟踪记录', tags: ['敏感肌', '学生党', '真实测评'] },
+    { id: 'K31', name: '老李聊护肤', platform: '微博', category: '行业观察', followers: 32000, avgViews: 6800, er: 0.038, female: 0.44, age: '30-45', price: 1500, style: '行业视角评论', tags: ['行业', '成分党', '男性'] },
+    { id: 'K32', name: '小圆脸阿满', platform: '抖音', category: '泛生活', followers: 128000, avgViews: 19000, er: 0.064, female: 0.9, age: '18-26', price: 5800, style: '日常分享/口播', tags: ['泛人群', '学生党', '颜值向'] }
+  ]
+};
+
+</script>
+<script>
+(function () {
+  'use strict';
+  var A = window.App, $ = A.$, esc = A.esc;
+
+  var state = { pool: window.BFDemo.kol.slice(), scored: [], picks: [] };
+
+  function tierOf(f) { return f >= 500000 ? '头部' : (f >= 100000 ? '腰部' : '尾部'); }
+  function estEng(k) { return Math.round(k.avgViews * k.er); }
+  function money(n) { return n >= 10000 ? (n / 10000).toFixed(n >= 100000 ? 0 : 1) + 'w' : String(n); }
+
+  ['aud', 'rel', 'cpe', 'scale'].forEach(function (k) {
+    var el = document.getElementById('w-' + k);
+    el.addEventListener('input', function () { document.getElementById('v-' + k).textContent = el.value; });
+  });
+  document.getElementById('aud').addEventListener('click', function (e) {
+    var lab = e.target.closest ? e.target.closest('.chip') : null;
+    if (lab) setTimeout(function () { lab.classList.toggle('on', lab.querySelector('input').checked); }, 0);
+  });
+
+  document.getElementById('btn-demo').addEventListener('click', function () {
+    state.pool = window.BFDemo.kol.slice();
+    document.getElementById('pool-note').innerHTML = '<b>已载入 32 条虚构示例档案</b>，仅演示评分与组队算法，不对应任何真实达人。';
+    A.toast('已载入示例池');
+  });
+
+  document.getElementById('file').addEventListener('change', function (e) {
+    var f = e.target.files[0];
+    if (!f) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var lines = String(reader.result).split(/\r?\n/).filter(Boolean);
+      var head = lines[0].split(',').map(function (s) { return s.trim().toLowerCase(); });
+      var idx = {};
+      head.forEach(function (h, i) { idx[h] = i; });
+      var pool = [];
+      lines.slice(1).forEach(function (ln, i) {
+        var c = ln.split(',');
+        var tagsRaw = (c[idx['标签']] || c[idx['tags']] || '').replace(/["']/g, '');
+        pool.push({
+          id: 'I' + (i + 1),
+          name: (c[idx['昵称']] || c[idx['name']] || '达人' + (i + 1)).replace(/["']/g, '').trim(),
+          platform: (c[idx['平台']] || c[idx['platform']] || '未标注').trim(),
+          category: (c[idx['品类']] || c[idx['category']] || '').trim(),
+          followers: Number(c[idx['粉丝数']] || c[idx['followers']] || 0),
+          avgViews: Number(c[idx['平均播放']] || c[idx['avgviews']] || 0),
+          er: Number(c[idx['互动率']] || c[idx['er']] || 0),
+          female: Number(c[idx['女性占比']] || c[idx['female']] || 0),
+          age: (c[idx['年龄']] || c[idx['age']] || '').trim(),
+          price: Number(c[idx['报价']] || c[idx['price']] || 0),
+          style: (c[idx['风格']] || c[idx['style']] || '').trim(),
+          tags: tagsRaw.split(/[|/、]/).map(function (s) { return s.trim(); }).filter(Boolean)
+        });
+      });
+      if (!pool.length) { A.toast('没读到数据行'); return; }
+      state.pool = pool;
+      document.getElementById('pool-note').innerHTML = '<b>已导入 ' + pool.length + ' 条</b>。字段建议：昵称,平台,品类,粉丝数,平均播放,互动率,女性占比,年龄,报价,风格,标签（用 | 分隔）。';
+      A.toast('导入完成');
+    };
+    reader.readAsText(f, 'utf-8');
+  });
+
+  function readBrief() {
+    var aud = A.$$('#aud input:checked').map(function (i) { return i.value; });
+    return {
+      product: document.getElementById('product').value.trim(),
+      cat: document.getElementById('category').value.split(/[,，]/).map(function (s) { return s.trim(); }).filter(Boolean),
+      aud: aud,
+      goal: document.getElementById('goal').value,
+      plat: document.getElementById('plat').value,
+      budget: Number(document.getElementById('budget').value) || 0,
+      w: {
+        aud: Number(document.getElementById('w-aud').value),
+        rel: Number(document.getElementById('w-rel').value),
+        cpe: Number(document.getElementById('w-cpe').value),
+        scale: Number(document.getElementById('w-scale').value)
+      }
+    };
+  }
+
+  function scoreAll(b) {
+    var pool = state.pool.filter(function (k) { return !b.plat || k.platform === b.plat; });
+    if (!pool.length) return [];
+
+    var cpes = pool.map(function (k) { return estEng(k) ? k.price / estEng(k) : 999; });
+    var minCpe = Math.min.apply(null, cpes.filter(function (c) { return c > 0 && c < 900; }).concat([1]));
+
+    var wSum = b.w.aud + b.w.rel + b.w.cpe + b.w.scale || 1;
+
+    return pool.map(function (k) {
+      var hit = k.tags.filter(function (t) { return b.aud.indexOf(t) > -1; }).length;
+      var audScore = b.aud.length ? Math.min(100, Math.round(hit / b.aud.length * 100)) : 50;
+      var genderGate = (b.aud.indexOf('男性') > -1) ? (k.female < 0.5) : (b.aud.indexOf('白领女性') > -1 ? k.female >= 0.8 : true);
+      if (!genderGate) audScore = Math.round(audScore * 0.6);
+      audScore = Math.max(5, Math.min(100, audScore));
+
+      var textAll = (k.category + ' ' + k.style + ' ' + k.tags.join(' '));
+      var relHit = b.cat.filter(function (c) { return c && textAll.indexOf(c) > -1; }).length;
+      var relScore = b.cat.length ? Math.round(Math.min(100, relHit / b.cat.length * 100)) : 50;
+      if (relScore < 10 && /护肤|美妆|成分/.test(textAll)) relScore = 25;
+      relScore = Math.max(5, relScore);
+
+      var eng = estEng(k);
+      var cpe = eng ? k.price / eng : 999;
+      var cpeScore = Math.max(5, Math.min(100, Math.round(minCpe / Math.max(cpe, 0.01) * 100)));
+
+      var scaleScore;
+      if (b.goal === 'brand') scaleScore = Math.min(100, Math.round(k.followers / 900000 * 100));
+      else if (b.goal === 'sales') scaleScore = Math.min(100, Math.round(k.er * 1000));
+      else scaleScore = Math.min(100, Math.round((k.er * 600) + (k.followers > 500000 ? 20 : 40)));
+      scaleScore = Math.max(5, scaleScore);
+
+      var total = (audScore * b.w.aud + relScore * b.w.rel + cpeScore * b.w.cpe + scaleScore * b.w.scale) / wSum;
+
+      var reason = [];
+      if (hit) reason.push('命中人群标签 ' + k.tags.filter(function (t) { return b.aud.indexOf(t) > -1; }).join('、'));
+      if (relHit) reason.push('品类相关词 ' + b.cat.filter(function (c) { return textAll.indexOf(c) > -1; }).join('、'));
+      reason.push('CPE ' + cpe.toFixed(1) + ' 元/互动');
+
+      return {
+        k: k, tier: tierOf(k.followers), eng: eng, cpe: cpe,
+        aud: audScore, rel: relScore, cpeS: cpeScore, scale: scaleScore,
+        total: Math.round(total * 10) / 10, reason: reason.join('；')
+      };
+    }).sort(function (a, b2) { return b2.total - a.total; });
+  }
+
+  function pick(b, scored) {
+    var left = b.budget, picks = [];
+    for (var i = 0; i < scored.length; i++) {
+      var s = scored[i];
+      if (s.k.price <= left * 0.6 && picks.length < 8) {
+        picks.push(s);
+        left -= s.k.price;
+      }
+      if (picks.length >= 6) break;
+    }
+    if (!picks.length && scored.length) {
+      var cheap = scored.slice().sort(function (a, c) { return a.k.price - c.k.price; })[0];
+      if (cheap.k.price <= b.budget) picks.push(cheap);
+    }
+    return picks;
+  }
+
+  function renderRows(scored) {
+    var tb = document.getElementById('rows');
+    if (!scored.length) {
+      tb.innerHTML = '<tr><td colspan="12"><div class="empty">当前条件下没有匹配的达人，放宽平台或人群试试</div></td></tr>';
+      return;
+    }
+    tb.innerHTML = scored.slice(0, 15).map(function (s, i) {
+      var k = s.k;
+      return '<tr>' +
+        '<td><span class="rank' + (i < 3 ? ' top' : '') + '">' + (i + 1) + '</span></td>' +
+        '<td><span class="nm">' + esc(k.name) + '</span><div class="sub">' + esc(k.platform) + ' · ' + esc(k.category) + '</div></td>' +
+        '<td><span class="tag">' + s.tier + '</span></td>' +
+        '<td class="num">' + money(k.followers) + '</td>' +
+        '<td class="num">¥' + money(k.price) + '</td>' +
+        '<td class="num">' + money(s.eng) + '</td>' +
+        '<td class="num">' + s.cpe.toFixed(1) + '</td>' +
+        '<td class="num">' + s.aud + '</td>' +
+        '<td class="num">' + s.rel + '</td>' +
+        '<td class="num">' + s.cpeS + '</td>' +
+        '<td class="num">' + s.scale + '</td>' +
+        '<td class="num"><b>' + s.total.toFixed(1) + '</b><div class="bar"><i style="width:' + Math.min(100, s.total) + '%"></i></div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function scriptFor(s, b) {
+    var k = s.k;
+    var p = b.product;
+    return k.name + '老师你好，我是' + p + '的品牌营销，看到你最近的' + (k.category || '内容') +
+      '系列，' + (s.reason.split('；')[0] || '受众和我们目标人群重合度很高') + '。\n' +
+      '这次想请你体验我们的' + p + '，核心是修护与稳定，不要求口播硬广，' +
+      (b.goal === 'sales' ? '希望挂车做一次转化测试，我们提供专属佣金与素材包。' : '更希望听到你的真实评价，好话坏话都可以写。') + '\n' +
+      '合作形式：' + (k.price > 10000 ? '单条图文/视频 + 授权二次分发' : '单条内容，可协商加拍') +
+      '，报价 ¥' + k.price + '，档期可以在' + (b.goal === 'sales' ? '活动前两周' : '本月内') + '灵活安排。方便的话我把 brief 和样品寄送信息发你？';
+  }
+
+  function renderPlan(b) {
+    var picks = state.picks, scored = state.scored;
+    var total = picks.reduce(function (s, x) { return s + x.k.price; }, 0);
+    var reach = picks.reduce(function (s, x) { return s + x.k.followers; }, 0);
+    var eng = picks.reduce(function (s, x) { return s + x.eng; }, 0);
+    document.getElementById('kpis').innerHTML = [
+      ['入选达人', picks.length + '<small>位</small>', '预算内自动组队'],
+      ['占用预算', '¥' + money(total), '预算 ¥' + money(b.budget)],
+      ['预估曝光', money(reach), '粉丝量合计（上限）'],
+      ['预估互动', money(eng), '按平均播放 × 互动率']
+    ].map(function (r) {
+      return '<div class="kpi"><div class="k">' + r[0] + '</div><div class="v">' + r[1] + '</div><div class="d">' + r[2] + '</div></div>';
+    }).join('');
+
+    var mix = {};
+    picks.forEach(function (p) { mix[p.tier] = (mix[p.tier] || 0) + 1; });
+    document.getElementById('plan-hint').textContent = '组合结构：' + Object.keys(mix).map(function (k) { return k + ' ' + mix[k] + ' 位'; }).join(' / ') +
+      '。选取逻辑：按总分降序，单笔不超过剩余预算 60%，最多 6 位，避免预算被一个头部吃光。';
+
+    document.getElementById('plan').innerHTML = picks.map(function (s, i) {
+      return '<div class="pick"><div class="h"><span class="rank' + (i < 3 ? ' top' : '') + '">' + (i + 1) + '</span><b>' + esc(s.k.name) + '</b>' +
+        '<span class="tag">' + esc(s.k.platform) + '</span><span class="tag">' + s.tier + '</span>' +
+        '<span class="tag brand">¥' + money(s.k.price) + '</span></div>' +
+        '<div class="note">' + esc(s.reason) + ' · 总分 ' + s.total.toFixed(1) + '</div>' +
+        '<div class="script" id="sc-' + i + '">' + esc(scriptFor(s, b)) + '</div></div>';
+    }).join('') || '<div class="empty">预算不足，无法组队</div>';
+
+    document.getElementById('plan-panel').classList.remove('hide');
+  }
+
+  document.getElementById('btn-run').addEventListener('click', function () {
+    var b = readBrief();
+    if (!b.aud.length) { A.toast('至少选一个目标人群'); return; }
+    state.scored = scoreAll(b);
+    state.picks = pick(b, state.scored);
+    state.brief = b;
+    renderRows(state.scored);
+    renderPlan(b);
+    A.toast('已按权重计算 ' + state.scored.length + ' 位达人');
+  });
+
+  document.getElementById('btn-llm').addEventListener('click', function () {
+    if (!A.LLM.ok()) { A.toast('先在右上角「模型设置」里接入大模型'); return; }
+    if (!state.picks.length) { A.toast('先生成方案'); return; }
+    var btn = this;
+    btn.disabled = true; btn.innerHTML = '<span class="spin"></span>生成中';
+    var b = state.brief;
+    var list = state.picks.map(function (s) {
+      return { name: s.k.name, platform: s.k.platform, category: s.k.category, price: s.k.price, reason: s.reason };
+    });
+    A.LLM.chat([
+      { role: 'system', content: '你是品牌方媒介 BD，擅长写不油滑、有信息量的达人建联私信。中文，简洁。' },
+      { role: 'user', content: '产品：' + b.product + '\n目标：' + b.goal + '\n达人：' + JSON.stringify(list) +
+        '\n\n请为每位达人写一段 120 字以内的建联私信，返回 JSON：{"scripts":[{"name":"达人名","text":"私信内容"}]}。要求：提到对方的具体内容方向，说清合作形式与报价，不夸大产品功效，不写「最」「第一」。' }
+    ], { json: true, temperature: 0.7 }).then(function (txt) {
+      var json = JSON.parse(txt.replace(/^```json\s*|```$/g, '').trim());
+      (json.scripts || []).forEach(function (s, i) {
+        var host = document.getElementById('sc-' + i);
+        if (host) host.textContent = s.text;
+      });
+      A.toast('话术已由模型重写');
+    }).catch(function (e) {
+      A.toast('生成失败：' + e.message, 4000);
+    }).then(function () {
+      btn.disabled = false; btn.textContent = '用大模型润色话术';
+    });
+  });
+
+  document.getElementById('btn-csv').addEventListener('click', function () {
+    if (!state.picks.length) { A.toast('先生成方案'); return; }
+    var b = state.brief;
+    var lines = ['昵称,平台,品类,粉丝数,报价,预估互动,CPE,人群分,相关分,性价比分,规模分,总分,入选理由'];
+    state.picks.forEach(function (s) {
+      var k = s.k;
+      lines.push([k.name, k.platform, k.category, k.followers, k.price, s.eng, s.cpe.toFixed(1), s.aud, s.rel, s.cpeS, s.scale, s.total, s.reason.replace(/,/g, '；')].join(','));
+    });
+    A.download('达人名单_' + (b.product || 'campaign').replace(/[\\/:*?"<>|\s]/g, '_') + '.csv', lines.join('\n'), 'text/csv');
+  });
+
+  document.getElementById('btn-run').click();
+})();
+</script>
+</body>
+</html>
